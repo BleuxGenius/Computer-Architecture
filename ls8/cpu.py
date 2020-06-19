@@ -1,4 +1,4 @@
-"""CPU functionality."""
+# """CPU functionality."""
 
 import sys
 
@@ -6,6 +6,10 @@ HLT = 0b00000001
 LDI = 0b10000010
 PRN = 0b01000111
 MUL = 0b10100010
+CMP = 0b10100111
+JMP = 0b01010100
+JEQ = 0b01010101
+JNE = 0b01010110
 
 
 class CPU:
@@ -36,7 +40,12 @@ class CPU:
             0b01000111: self.prn,
             0b10100010: self.mul,
             0b01000110: self.pop,
-            0b01000101: self.push
+            0b01000101: self.push,
+            0b10100111: self.cmp,
+            0b01010100: self.jmp,
+            0b01010101: self.jeq,
+            0b01010110: self.jne
+
         }
         
     def __repr__(self):
@@ -62,6 +71,41 @@ class CPU:
         print(self.registers[operand_a])
         return (2, True)
 
+# should move to alu 
+    def cmp(self, operand_a, operand_b):
+        if self.registers[operand_a] == self.registers[operand_b]:
+            self.equal = 1
+        else:
+            self.equal = 0 
+        self.op_pc = False
+
+        if not self.op_pc:
+            self.pc += 3  
+
+    def jmp(self, operand_a, operand_b):
+        self.pc = self.registers[operand_a]
+
+        self.op_pc = True
+
+        if not self.op_pc:
+            self.pc += 2  
+
+    def jeq(self, operand_a, operand_b):
+        if self.equal == 1:
+            self.pc = registers[operand_a]
+            self. op_pc = True
+
+        if not self.op_pc:
+            self.pc += 2   
+
+    def jne(self, operand_a, operand_b):
+        if self.equal == 0:
+            self.pc = self.registers[operand_a]
+            self.op_pc = True
+
+        if not self.op_pc:
+            self.pc += 2                             
+
     def mul(self, operand_a, operand_b):
         # multiply two values to store in register
         self.alu(MUL, operand_a, operand_b)
@@ -84,6 +128,8 @@ class CPU:
         # writes value to RAM at stack pointer address
         self.ram_write(value, self.SP)
         return (2, True)
+
+        
 
     def load(self, program_filepath):
         """Load a program into memory."""
