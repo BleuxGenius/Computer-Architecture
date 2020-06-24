@@ -1,4 +1,4 @@
-# """CPU functionality."""
+"""CPU functionality."""
 
 import sys
 
@@ -11,20 +11,19 @@ JMP = 0b01010100
 JEQ = 0b01010101
 JNE = 0b01010110
 
-
 class CPU:
     """Main CPU class."""
 
     def __init__(self):
         """Construct a new CPU."""
-        # step one add constructor (memory)
+         # step one add constructor (memory)
         self.ram = [0] * 256
         # register( general purpose registers)
         self.registers = [0] * 8
         # reset the stack pointer 
         self.registers[7] = 0xF4 
 
-    #    store program counter 
+        # store program counter 
         self.pc = self.registers[0]
         # store the flags 
         self.fl = self.registers[4]
@@ -45,9 +44,8 @@ class CPU:
             0b01010100: self.jmp,
             0b01010101: self.jeq,
             0b01010110: self.jne
-
         }
-        
+
     def __repr__(self):
         return f"RAM: {self.ram} Register: {self.ram}"
 
@@ -71,7 +69,7 @@ class CPU:
         print(self.registers[operand_a])
         return (2, True)
 
-# should move to alu 
+        # should move to alu 
     def cmp(self, operand_a, operand_b):
         if self.registers[operand_a] == self.registers[operand_b]:
             self.equal = 1
@@ -92,19 +90,19 @@ class CPU:
 
     def jeq(self, operand_a, operand_b):
         if self.equal == 1:
-            self.pc = registers[operand_a]
+            self.pc = self.registers[operand_a]
             self. op_pc = True
 
         if not self.op_pc:
-            self.pc += 2   
-
+            self.pc += 2
     def jne(self, operand_a, operand_b):
         if self.equal == 0:
             self.pc = self.registers[operand_a]
             self.op_pc = True
 
         if not self.op_pc:
-            self.pc += 2                             
+            self.pc += 2
+            
 
     def mul(self, operand_a, operand_b):
         # multiply two values to store in register
@@ -129,14 +127,10 @@ class CPU:
         self.ram_write(value, self.SP)
         return (2, True)
 
-        
-
-    def load(self, program_filepath):
+    def load(self):
         """Load a program into memory."""
-        try:
-
-            address = 0
-    # Open program file, loop -> parse line (ignore comments), store into memory at address, inc address
+        program_file = sys.argv[1]
+        # Open program file, loop -> parse line (ignore comments), store into memory at address, inc address
         # program_file = open(input_file, "r")
         # for line in program_file
             # Remove whitespace
@@ -147,17 +141,14 @@ class CPU:
             # to a binary number
             # Insert instruction into memory
             # Inc to next pos in memory
-            with open(self.program_filepath) as f:
-                for line in f:
-                    line = line.split("#")[0]
-                    line = line.strip()
-                    if line == '':
-                        continue
-                # line = int(line) # For the daily project we want int(line, 2) <- saying we want base 2 for binary
-                self.ram[address] = int(line, 2)
-                address += 1
-        except FileNotFoundError:
-            print(f"{sys.argv[0]}: {sys.argv[1] not found}")        
+        with open(program_file) as f:
+            for address,line in enumerate(f):
+                line = line.split("#")
+                try:
+                    value = int(line[0], 2)
+                except FileNotFoundError:
+                    continue
+                self.ram_write(address, value)
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -192,20 +183,18 @@ class CPU:
     def run(self):
         """Run the CPU."""
         IR = self.ram[self.pc]
-         
         if len(sys.argv) != 2:
             print("usage: cpu.py filename")
             sys.exit(1)
-
             # get program file 
         self.program_filepath = sys.argv[1]
-            # load program into memory 
-        self.load()    
-
+        # load program into memory 
+        self.load()
+        running = None
         while running:
             # use program counter to get current instruction 
                 IR = self.ram[self.pc]
-                # oprands for the instruction 
+                # oprands for the instruction
                 operand_a = self.ram[self.pc + 1]
                 operand_b = self.ram[self.pc + 2]
                 try:
@@ -216,5 +205,3 @@ class CPU:
                         print("Unknown command: {IR}")
                         sys.exit(1)
 
-cpu = CPU()
-cpu.run()
