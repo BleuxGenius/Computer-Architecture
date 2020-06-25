@@ -75,33 +75,39 @@ class CPU:
             self.equal = 1
         else:
             self.equal = 0 
-        self.op_pc = False
+        # self.op_pc = False
 
-        if not self.op_pc:
-            self.pc += 3  
+        # if not self.op_pc:
+        #     self.pc += 3  
+        return(3, True)
 
     def jmp(self, operand_a, operand_b):
         self.pc = self.registers[operand_a]
 
-        self.op_pc = True
+        # self.op_pc = True
 
-        if not self.op_pc:
-            self.pc += 2  
+        # if not self.op_pc:
+        #     self.pc += 2 
+        return(0,True)
 
     def jeq(self, operand_a, operand_b):
         if self.equal == 1:
             self.pc = self.registers[operand_a]
-            self. op_pc = True
+            return(0,True)
 
-        if not self.op_pc:
-            self.pc += 2
+        # if not self.op_pc:
+        #     self.pc += 2
+        return(2, True)
+
     def jne(self, operand_a, operand_b):
         if self.equal == 0:
             self.pc = self.registers[operand_a]
-            self.op_pc = True
+            return(0, True)
+        #     self.op_pc = True
 
-        if not self.op_pc:
-            self.pc += 2
+        # if not self.op_pc:
+        #     self.pc += 2
+        return(2, True)
             
 
     def mul(self, operand_a, operand_b):
@@ -129,26 +135,55 @@ class CPU:
 
     def load(self):
         """Load a program into memory."""
-        program_file = sys.argv[1]
-        # Open program file, loop -> parse line (ignore comments), store into memory at address, inc address
-        # program_file = open(input_file, "r")
-        # for line in program_file
+        # program_file = sys.argv[1]
+        # # Open program file, loop -> parse line (ignore comments), store into memory at address, inc address
+        # # program_file = open(input_file, "r")
+        # # for line in program_file
+        #     # Remove whitespace
+        #     # Ignore blank lines
+        #     # Ignore lines that start with comments
+        #     # All instructions are 1 byte so just
+        #     # take the first 8 chars and convert
+        #     # to a binary number
+        #     # Insert instruction into memory
+        #     # Inc to next pos in memory
+        # with open(program_file) as f:
+        #     for address,line in enumerate(f):
+        #         line = line.split("#")
+        #         try:
+        #             value = int(line[0], 2)
+        #         except FileNotFoundError:
+        #             continue
+        #         self.ram_write(address, value)
+        address = 0
+
+        # # Open program file, loop -> parse line (ignore comments), store into memory at address, inc address
+        program_file = open("ls8/examples/sctest.ls8", "r")
+
+        for line in program_file:
             # Remove whitespace
+            line = line.strip()
+
             # Ignore blank lines
+            if not line:
+                continue
+
             # Ignore lines that start with comments
+            if line[0] == "#":
+                continue
+
             # All instructions are 1 byte so just
             # take the first 8 chars and convert
             # to a binary number
+            instruction = int(line[:8], 2)
+
             # Insert instruction into memory
+            self.ram[address] = instruction
+
             # Inc to next pos in memory
-        with open(program_file) as f:
-            for address,line in enumerate(f):
-                line = line.split("#")
-                try:
-                    value = int(line[0], 2)
-                except FileNotFoundError:
-                    continue
-                self.ram_write(address, value)
+            address += 1
+
+        program_file.close()
 
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
@@ -182,15 +217,15 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        IR = self.ram[self.pc]
-        if len(sys.argv) != 2:
-            print("usage: cpu.py filename")
-            sys.exit(1)
-            # get program file 
-        self.program_filepath = sys.argv[1]
+        # IR = self.ram[self.pc]
+        # if len(sys.argv) != 2:
+        #     print("usage: cpu.py filename")
+        #     sys.exit(1)
+        #     # get program file 
+        # self.program_filepath = sys.argv[1]
         # load program into memory 
-        self.load()
-        running = None
+        # self.load()
+        running = True
         while running:
             # use program counter to get current instruction 
                 IR = self.ram[self.pc]
